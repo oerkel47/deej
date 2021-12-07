@@ -2,6 +2,7 @@ package deej
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"strings"
 	"time"
@@ -44,7 +45,7 @@ const (
 	userConfigName     = "config"
 	internalConfigName = "preferences"
 
-	userConfigPath = "."
+	//userConfigPath = "."
 
 	configType = "yaml"
 
@@ -60,6 +61,8 @@ const (
 
 // has to be defined as a non-constant because we're using path.Join
 var internalConfigPath = path.Join(".", logDirectory)
+var exepath, _ = os.Executable()
+var userConfigPath, _ = path.Split(exepath)
 
 var defaultSliderMapping = func() *sliderMap {
 	emptyMap := newSliderMap()
@@ -108,7 +111,7 @@ func (cc *CanonicalConfig) Load() error {
 	cc.logger.Debugw("Loading config", "path", userConfigFilepath)
 
 	// make sure it exists
-	if !util.FileExists(userConfigFilepath) {
+	if !util.FileExists(path.Join(userConfigPath, userConfigFilepath)) {
 		cc.logger.Warnw("Config file not found", "path", userConfigFilepath)
 		cc.notifier.Notify("Can't find configuration!",
 			fmt.Sprintf("%s must be in the same directory as deej. Please re-launch", userConfigFilepath))
